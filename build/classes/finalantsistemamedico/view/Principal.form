@@ -153,9 +153,9 @@
                                       <Component id="txtBuscar" alignment="0" max="32767" attributes="0"/>
                                       <Component id="btnBuscar" max="32767" attributes="0"/>
                                       <Component id="btnLimpiar" max="32767" attributes="0"/>
-                                      <Component id="btnLimpiar1" max="32767" attributes="0"/>
-                                      <Component id="btnLimpiar2" max="32767" attributes="0"/>
-                                      <Component id="btnLimpiar3" max="32767" attributes="0"/>
+                                      <Component id="btnAgregar" max="32767" attributes="0"/>
+                                      <Component id="btnEliminar" max="32767" attributes="0"/>
+                                      <Component id="btnConsulta" max="32767" attributes="0"/>
                                   </Group>
                                   <EmptySpace max="-2" attributes="0"/>
                               </Group>
@@ -173,11 +173,11 @@
                           <EmptySpace type="separate" max="-2" attributes="0"/>
                           <Component id="btnLimpiar" min="-2" max="-2" attributes="0"/>
                           <EmptySpace type="separate" max="-2" attributes="0"/>
-                          <Component id="btnLimpiar1" min="-2" max="-2" attributes="0"/>
+                          <Component id="btnAgregar" min="-2" max="-2" attributes="0"/>
                           <EmptySpace type="separate" max="-2" attributes="0"/>
-                          <Component id="btnLimpiar2" min="-2" max="-2" attributes="0"/>
+                          <Component id="btnEliminar" min="-2" max="-2" attributes="0"/>
                           <EmptySpace type="separate" max="-2" attributes="0"/>
-                          <Component id="btnLimpiar3" min="-2" max="-2" attributes="0"/>
+                          <Component id="btnConsulta" min="-2" max="-2" attributes="0"/>
                           <EmptySpace pref="211" max="32767" attributes="0"/>
                           <Component id="btnSalirr" min="-2" max="-2" attributes="0"/>
                           <EmptySpace min="-2" pref="83" max="-2" attributes="0"/>
@@ -230,7 +230,7 @@
                     <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
                       <Color blue="ff" green="cc" red="0" type="rgb"/>
                     </Property>
-                    <Property name="text" type="java.lang.String" value="LIMPIAR"/>
+                    <Property name="text" type="java.lang.String" value="ACTUALIZAR"/>
                     <Property name="colorDeSombra" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
                       <Color blue="ff" green="99" red="0" type="rgb"/>
                     </Property>
@@ -242,7 +242,7 @@
                     <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnLimpiarActionPerformed"/>
                   </Events>
                 </Component>
-                <Component class="org.edisoncor.gui.button.ButtonAction" name="btnLimpiar1">
+                <Component class="org.edisoncor.gui.button.ButtonAction" name="btnAgregar">
                   <Properties>
                     <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
                       <Color blue="ff" green="cc" red="0" type="rgb"/>
@@ -256,10 +256,10 @@
                     </Property>
                   </Properties>
                   <Events>
-                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnLimpiar1ActionPerformed"/>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnAgregarActionPerformed"/>
                   </Events>
                 </Component>
-                <Component class="org.edisoncor.gui.button.ButtonAction" name="btnLimpiar2">
+                <Component class="org.edisoncor.gui.button.ButtonAction" name="btnEliminar">
                   <Properties>
                     <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
                       <Color blue="ff" green="cc" red="0" type="rgb"/>
@@ -273,10 +273,10 @@
                     </Property>
                   </Properties>
                   <Events>
-                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnLimpiar2ActionPerformed"/>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnEliminarActionPerformed"/>
                   </Events>
                 </Component>
-                <Component class="org.edisoncor.gui.button.ButtonAction" name="btnLimpiar3">
+                <Component class="org.edisoncor.gui.button.ButtonAction" name="btnConsulta">
                   <Properties>
                     <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
                       <Color blue="ff" green="cc" red="0" type="rgb"/>
@@ -290,7 +290,7 @@
                     </Property>
                   </Properties>
                   <Events>
-                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnLimpiar3ActionPerformed"/>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnConsultaActionPerformed"/>
                   </Events>
                 </Component>
               </SubComponents>

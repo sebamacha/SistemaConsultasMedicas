@@ -16,6 +16,8 @@ import javax.swing.JOptionPane;
 public class Principal extends javax.swing.JFrame {
 
     private Connection connection; // Agregar un atributo de tipo Connection
+        private int idPacienteSeleccionado = -1; // Inicialmente no hay paciente seleccionado
+
 
     public Principal(Connection connection) {
         this.connection = connection; // Asignar la conexión
@@ -24,30 +26,54 @@ public class Principal extends javax.swing.JFrame {
         fillTableWithPatients();
         setLocationRelativeTo(null);
     }
+ // Método para actualizar la tabla de pacientes
+    public void actualizarTablaPacientes() {
+        DefaultTableModel model = (DefaultTableModel) tablePacientes.getModel();
+        // Limpiar los datos existentes en la tabla
+        model.setRowCount(0);
+        // Llenar la tabla con los datos actualizados desde la base de datos
+        fillTableWithPatients();
+    }
+ private void fillTableWithPatients() {
+    PacienteDAO pacienteDAO = new PacienteDAO(connection);
+    List<Paciente> pacientes = null;
+    try {
+        pacientes = pacienteDAO.getAll();
+    } catch (SQLException e) {
+        // Manejar la excepción aquí, por ejemplo, imprimir el mensaje de error
+        e.printStackTrace();
+    }
 
-    private void fillTableWithPatients() {
-        PacienteDAO pacienteDAO = new PacienteDAO(connection);
-        List<Paciente> pacientes = null;
-        try {
-            pacientes = pacienteDAO.getAll();
-        } catch (SQLException e) {
-            // Manejar la excepción aquí, por ejemplo, imprimir el mensaje de error
-            e.printStackTrace();
-        }
-
-        if (pacientes != null) {
-            DefaultTableModel model = (DefaultTableModel) tablePacientes.getModel();
-            for (Paciente paciente : pacientes) {
-                Object[] rowData = {
-                    paciente.getNombre(),
-                    paciente.getApellido(),
-                    paciente.getObraSocial(),
-                    paciente.getNumeroSocio()
-                };
-                model.addRow(rowData);
-            }
+    if (pacientes != null) {
+        DefaultTableModel model = (DefaultTableModel) tablePacientes.getModel();
+        model.setRowCount(0); // Limpiar los datos existentes en la tabla
+        
+        for (Paciente paciente : pacientes) {
+            Object[] rowData = {
+                paciente.getId(),
+                paciente.getNombre(),
+                paciente.getApellido(),
+                paciente.getFechaNacimiento(),
+                paciente.getObraSocial(),
+                paciente.getNumeroSocio(),
+                paciente.getAntecedentesPersonales(),
+                paciente.getAntecedentesFamiliares()
+            };
+            model.addRow(rowData);
         }
     }
+       // Agregar un listener de selección a la tabla
+    tablePacientes.getSelectionModel().addListSelectionListener(e -> {
+        if (!e.getValueIsAdjusting()) {
+            // Obtener el valor de la columna invisible de ID del paciente seleccionado
+            int selectedRow = tablePacientes.getSelectedRow();
+            int idPacienteSeleccionado = (int) tablePacientes.getValueAt(selectedRow, 0); // Cambia 0 por el índice correcto de la columna
+
+            // Puedes almacenar idPacienteSeleccionado como una variable de clase en tu objeto Principal
+            this.idPacienteSeleccionado = idPacienteSeleccionado;
+        }
+    });
+}
 
 
     /**
@@ -68,9 +94,9 @@ public class Principal extends javax.swing.JFrame {
         btnBuscar = new org.edisoncor.gui.button.ButtonAction();
         txtBuscar = new org.edisoncor.gui.textField.TextField();
         btnLimpiar = new org.edisoncor.gui.button.ButtonAction();
-        btnLimpiar1 = new org.edisoncor.gui.button.ButtonAction();
-        btnLimpiar2 = new org.edisoncor.gui.button.ButtonAction();
-        btnLimpiar3 = new org.edisoncor.gui.button.ButtonAction();
+        btnAgregar = new org.edisoncor.gui.button.ButtonAction();
+        btnEliminar = new org.edisoncor.gui.button.ButtonAction();
+        btnConsulta = new org.edisoncor.gui.button.ButtonAction();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -117,7 +143,7 @@ public class Principal extends javax.swing.JFrame {
         });
 
         btnLimpiar.setBackground(new java.awt.Color(0, 204, 255));
-        btnLimpiar.setText("LIMPIAR");
+        btnLimpiar.setText("ACTUALIZAR");
         btnLimpiar.setColorDeSombra(new java.awt.Color(0, 153, 255));
         btnLimpiar.setFont(new java.awt.Font("Arial", 1, 18)); // NOI18N
         btnLimpiar.addActionListener(new java.awt.event.ActionListener() {
@@ -126,33 +152,33 @@ public class Principal extends javax.swing.JFrame {
             }
         });
 
-        btnLimpiar1.setBackground(new java.awt.Color(0, 204, 255));
-        btnLimpiar1.setText("AGREGAR");
-        btnLimpiar1.setColorDeSombra(new java.awt.Color(0, 153, 255));
-        btnLimpiar1.setFont(new java.awt.Font("Arial", 1, 18)); // NOI18N
-        btnLimpiar1.addActionListener(new java.awt.event.ActionListener() {
+        btnAgregar.setBackground(new java.awt.Color(0, 204, 255));
+        btnAgregar.setText("AGREGAR");
+        btnAgregar.setColorDeSombra(new java.awt.Color(0, 153, 255));
+        btnAgregar.setFont(new java.awt.Font("Arial", 1, 18)); // NOI18N
+        btnAgregar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnLimpiar1ActionPerformed(evt);
+                btnAgregarActionPerformed(evt);
             }
         });
 
-        btnLimpiar2.setBackground(new java.awt.Color(0, 204, 255));
-        btnLimpiar2.setText("ELIMINAR");
-        btnLimpiar2.setColorDeSombra(new java.awt.Color(0, 153, 255));
-        btnLimpiar2.setFont(new java.awt.Font("Arial", 1, 18)); // NOI18N
-        btnLimpiar2.addActionListener(new java.awt.event.ActionListener() {
+        btnEliminar.setBackground(new java.awt.Color(0, 204, 255));
+        btnEliminar.setText("ELIMINAR");
+        btnEliminar.setColorDeSombra(new java.awt.Color(0, 153, 255));
+        btnEliminar.setFont(new java.awt.Font("Arial", 1, 18)); // NOI18N
+        btnEliminar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnLimpiar2ActionPerformed(evt);
+                btnEliminarActionPerformed(evt);
             }
         });
 
-        btnLimpiar3.setBackground(new java.awt.Color(0, 204, 255));
-        btnLimpiar3.setText("CONSULTA");
-        btnLimpiar3.setColorDeSombra(new java.awt.Color(0, 153, 255));
-        btnLimpiar3.setFont(new java.awt.Font("Arial", 1, 18)); // NOI18N
-        btnLimpiar3.addActionListener(new java.awt.event.ActionListener() {
+        btnConsulta.setBackground(new java.awt.Color(0, 204, 255));
+        btnConsulta.setText("CONSULTA");
+        btnConsulta.setColorDeSombra(new java.awt.Color(0, 153, 255));
+        btnConsulta.setFont(new java.awt.Font("Arial", 1, 18)); // NOI18N
+        btnConsulta.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnLimpiar3ActionPerformed(evt);
+                btnConsultaActionPerformed(evt);
             }
         });
 
@@ -171,9 +197,9 @@ public class Principal extends javax.swing.JFrame {
                             .addComponent(txtBuscar, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(btnBuscar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(btnLimpiar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(btnLimpiar1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(btnLimpiar2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(btnLimpiar3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addComponent(btnAgregar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(btnEliminar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(btnConsulta, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addContainerGap())))
         );
         panelRectTranslucido1Layout.setVerticalGroup(
@@ -186,11 +212,11 @@ public class Principal extends javax.swing.JFrame {
                 .addGap(18, 18, 18)
                 .addComponent(btnLimpiar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
-                .addComponent(btnLimpiar1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(btnAgregar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
-                .addComponent(btnLimpiar2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(btnEliminar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
-                .addComponent(btnLimpiar3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(btnConsulta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 211, Short.MAX_VALUE)
                 .addComponent(btnSalirr, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(83, 83, 83))
@@ -310,26 +336,62 @@ public class Principal extends javax.swing.JFrame {
     }
     }//GEN-LAST:event_btnLimpiarActionPerformed
 
-    private void btnLimpiar1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLimpiar1ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_btnLimpiar1ActionPerformed
+    private void btnAgregarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAgregarActionPerformed
+         NuevoPaciente nuevoPacienteFrame = new NuevoPaciente(connection);
+        nuevoPacienteFrame.setVisible(true);
+    }//GEN-LAST:event_btnAgregarActionPerformed
 
-    private void btnLimpiar2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLimpiar2ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_btnLimpiar2ActionPerformed
+    private void btnEliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarActionPerformed
+           int selectedRow = tablePacientes.getSelectedRow();
+    if (selectedRow == -1) {
+        // No se ha seleccionado ningún paciente
+        JOptionPane.showMessageDialog(this, "Por favor, seleccione un paciente para eliminar.", "Error", JOptionPane.ERROR_MESSAGE);
+        return;
+    }
 
-    private void btnLimpiar3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLimpiar3ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_btnLimpiar3ActionPerformed
+    int confirmResult = JOptionPane.showConfirmDialog(this, "¿Está seguro de que desea eliminar el paciente seleccionado?", "Confirmación", JOptionPane.YES_NO_OPTION);
+    if (confirmResult == JOptionPane.YES_OPTION) {
+        DefaultTableModel model = (DefaultTableModel) tablePacientes.getModel();
+        int pacienteId = (int) model.getValueAt(selectedRow, 0);
+
+        try {
+            PacienteDAO pacienteDAO = new PacienteDAO(connection);
+            pacienteDAO.delete(pacienteId); // Eliminar el paciente de la base de datos
+
+            model.removeRow(selectedRow); // Eliminar la fila de la tabla
+
+            JOptionPane.showMessageDialog(this, "Paciente eliminado correctamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(this, "Error al eliminar el paciente.", "Error", JOptionPane.ERROR_MESSAGE);
+            ex.printStackTrace();
+        }
+    }
+    }//GEN-LAST:event_btnEliminarActionPerformed
+
+    
+    private void btnConsultaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnConsultaActionPerformed
+    int filaSeleccionada = tablePacientes.getSelectedRow();
+    if (filaSeleccionada != -1) {
+        int idPacienteSeleccionado = (int) tablePacientes.getValueAt(filaSeleccionada, 0);
+        String nombrePaciente = (String) tablePacientes.getValueAt(filaSeleccionada, 1);
+        String apellidoPaciente = (String) tablePacientes.getValueAt(filaSeleccionada, 2);
+
+        NuevaConsulta nuevaConsulta = new NuevaConsulta(nombrePaciente, apellidoPaciente, idPacienteSeleccionado);
+        nuevaConsulta.setVisible(true);
+    } else {
+        // Manejar el caso en el que no se haya seleccionado ningún paciente
+        // Puedes mostrar un mensaje al usuario o realizar otras acciones
+    }
+    }//GEN-LAST:event_btnConsultaActionPerformed
 
    
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private org.edisoncor.gui.button.ButtonAction btnAgregar;
     private org.edisoncor.gui.button.ButtonAction btnBuscar;
+    private org.edisoncor.gui.button.ButtonAction btnConsulta;
+    private org.edisoncor.gui.button.ButtonAction btnEliminar;
     private org.edisoncor.gui.button.ButtonAction btnLimpiar;
-    private org.edisoncor.gui.button.ButtonAction btnLimpiar1;
-    private org.edisoncor.gui.button.ButtonAction btnLimpiar2;
-    private org.edisoncor.gui.button.ButtonAction btnLimpiar3;
     private org.edisoncor.gui.button.ButtonAction btnSalirr;
     private javax.swing.JScrollPane jScrollPane1;
     private org.edisoncor.gui.panel.Panel panel1;

@@ -5,6 +5,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,15 +16,23 @@ public class PacienteDAO {
         this.connection = connection;
     }
 
-  public void create(Paciente paciente) throws SQLException {
+public void create(Paciente paciente) throws SQLException {
     String sql = "INSERT INTO pacientes (Nombre, Apellido, FechaNacimiento, ObraSocial, NumeroSocio, AntecedentesPersonales, AntecedentesFamiliares) VALUES (?, ?, ?, ?, ?, ?, ?)";
     try (PreparedStatement statement = connection.prepareStatement(sql)) {
         statement.setString(1, paciente.getNombre());
         statement.setString(2, paciente.getApellido());
-        
-        java.sql.Date fechaNacimiento = new java.sql.Date(paciente.getFechaNacimiento().getTime());
+
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+        java.util.Date fechaNacimientoUtil = null;
+        try {
+            fechaNacimientoUtil = dateFormat.parse(paciente.getFechaNacimientoString());
+        } catch (java.text.ParseException e) {
+            e.printStackTrace(); // Manejar la excepción apropiadamente
+        }
+
+        java.sql.Date fechaNacimiento = new java.sql.Date(fechaNacimientoUtil.getTime());
         statement.setDate(3, fechaNacimiento);
-        
+
         statement.setString(4, paciente.getObraSocial());
         statement.setString(5, paciente.getNumeroSocio());
         statement.setString(6, paciente.getAntecedentesPersonales());
@@ -62,13 +71,20 @@ public class PacienteDAO {
 
 
 
-    public void delete(int id) throws SQLException {
-        String sql = "DELETE FROM pacientes WHERE Id = ?";
-        try (PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setInt(1, id);
-            statement.executeUpdate();
-        }
+public void delete(int id) throws SQLException {
+    String sql = "DELETE FROM pacientes WHERE Id = ?";
+    try (PreparedStatement statement = connection.prepareStatement(sql)) {
+        statement.setInt(1, id);
+        statement.executeUpdate();
     }
+}
+
+
+
+
+
+
+
 
     public List<Paciente> getAll() throws SQLException {
         List<Paciente> pacientes = new ArrayList<>();

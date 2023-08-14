@@ -1,6 +1,7 @@
 package finalantsistemamedico.model;
 
 import java.sql.Date;  // Importar la clase java.sql.Date
+import java.text.SimpleDateFormat;
 
 public class Paciente {
     private int id;
@@ -24,6 +25,10 @@ public class Paciente {
         this.numeroSocio = numeroSocio;
         this.antecedentesPersonales = antecedentesPersonales;
         this.antecedentesFamiliares = antecedentesFamiliares;
+    }
+    public String getFechaNacimientoString() {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+        return dateFormat.format(fechaNacimiento);
     }
 
     // Getters y setters
