@@ -1,5 +1,6 @@
 package finalantsistemamedico.controller;
 
+import finalantsistemamedico.model.Consulta;
 import finalantsistemamedico.model.Paciente;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -53,7 +54,27 @@ public void create(Paciente paciente) throws SQLException {
         }
         return null;
     }
+ public Paciente getPacienteById(int pacienteId) throws SQLException {
+        Paciente paciente = null;
 
+        String query = "SELECT * FROM pacientes WHERE id = ?";
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setInt(1, pacienteId);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    paciente = new Paciente();
+                    paciente.setId(resultSet.getInt("id"));
+                    paciente.setNombre(resultSet.getString("nombre"));
+                    paciente.setApellido(resultSet.getString("apellido"));
+                    paciente.setFechaNacimiento(resultSet.getDate("fecha_nacimiento"));
+                    paciente.setObraSocial(resultSet.getString("obra_social"));
+                    // ... Configura el resto de las propiedades del paciente
+                }
+            }
+        }
+        
+        return paciente;
+    }
  public void update(Paciente paciente) throws SQLException {
     String sql = "UPDATE pacientes SET Nombre = ?, Apellido = ?, FechaNacimiento = ?, ObraSocial = ?, NumeroSocio = ?, AntecedentesPersonales = ?, AntecedentesFamiliares = ? WHERE Id = ?";
     try (PreparedStatement statement = connection.prepareStatement(sql)) {
@@ -136,5 +157,31 @@ public void delete(int id) throws SQLException {
     }
     return pacientes;
 }
+    
+      public List<Consulta> getConsultasByPacienteId(int pacienteId) throws SQLException {
+        List<Consulta> consultas = new ArrayList<>();
+
+        String query = "SELECT * FROM consultas WHERE paciente_id = ?";
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setInt(1, pacienteId);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                while (resultSet.next()) {
+                    Consulta consulta = new Consulta();
+                    consulta.setId(resultSet.getInt("id"));
+                    consulta.setPacienteId(resultSet.getInt("paciente_id"));
+                    consulta.setTitulo(resultSet.getString("titulo"));
+                    consulta.setDiagnostico(resultSet.getString("diagnostico"));
+                    // ... Configura el resto de las propiedades de la consulta
+                    consultas.add(consulta);
+                }
+            }
+        }
+        
+        return consultas;
+    }
+
+    public Paciente getById(int idPacienteSeleccionado) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
 
 }

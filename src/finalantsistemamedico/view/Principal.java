@@ -2,21 +2,31 @@
 package finalantsistemamedico.view;
 
 
-
+import com.lowagie.text.Document;
+import com.lowagie.text.DocumentException;
+import com.lowagie.text.Element;
+import com.lowagie.text.Paragraph;
+import com.lowagie.text.pdf.PdfWriter;
+import finalantsistemamedico.controller.ConsultaDAO;
 import finalantsistemamedico.controller.PacienteDAO;
+import finalantsistemamedico.model.Consulta;
 import finalantsistemamedico.model.Paciente;
+
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
-import javax.swing.table.DefaultTableModel;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
+
+
 
 public class Principal extends javax.swing.JFrame {
-
+private static Principal instancia;
     private Connection connection; // Agregar un atributo de tipo Connection
-        private int idPacienteSeleccionado = -1; // Inicialmente no hay paciente seleccionado
+        private int idPacienteSeleccionado = 0; // Inicialmente no hay paciente seleccionado
+    
 
 
     public Principal(Connection connection) {
@@ -34,7 +44,9 @@ public class Principal extends javax.swing.JFrame {
         // Llenar la tabla con los datos actualizados desde la base de datos
         fillTableWithPatients();
     }
+ 
  private void fillTableWithPatients() {
+     
     PacienteDAO pacienteDAO = new PacienteDAO(connection);
     List<Paciente> pacientes = null;
     try {
@@ -97,6 +109,7 @@ public class Principal extends javax.swing.JFrame {
         btnAgregar = new org.edisoncor.gui.button.ButtonAction();
         btnEliminar = new org.edisoncor.gui.button.ButtonAction();
         btnConsulta = new org.edisoncor.gui.button.ButtonAction();
+        btnHistorial = new org.edisoncor.gui.button.ButtonAction();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -107,7 +120,7 @@ public class Principal extends javax.swing.JFrame {
 
             },
             new String [] {
-                "NOMBRE", "APELLIDO", "OBRA SOCIAL", "NUM SOCIO"
+                "ID PACIENTE", "NOMBRE", "APELLIDO", "FEC NACIMIENTO"
             }
         ));
         jScrollPane1.setViewportView(tablePacientes);
@@ -117,6 +130,7 @@ public class Principal extends javax.swing.JFrame {
         panelRectTranslucido1.setTran(0.0F);
 
         btnSalirr.setBackground(new java.awt.Color(0, 204, 255));
+        btnSalirr.setForeground(new java.awt.Color(255, 0, 0));
         btnSalirr.setText("SALIR");
         btnSalirr.setColorDeSombra(new java.awt.Color(0, 153, 255));
         btnSalirr.setFont(new java.awt.Font("Arial", 1, 18)); // NOI18N
@@ -127,6 +141,7 @@ public class Principal extends javax.swing.JFrame {
         });
 
         btnBuscar.setBackground(new java.awt.Color(0, 204, 255));
+        btnBuscar.setForeground(new java.awt.Color(204, 255, 0));
         btnBuscar.setText("BUSCAR");
         btnBuscar.setColorDeSombra(new java.awt.Color(0, 153, 255));
         btnBuscar.setFont(new java.awt.Font("Arial", 1, 18)); // NOI18N
@@ -143,6 +158,7 @@ public class Principal extends javax.swing.JFrame {
         });
 
         btnLimpiar.setBackground(new java.awt.Color(0, 204, 255));
+        btnLimpiar.setForeground(new java.awt.Color(204, 255, 102));
         btnLimpiar.setText("ACTUALIZAR");
         btnLimpiar.setColorDeSombra(new java.awt.Color(0, 153, 255));
         btnLimpiar.setFont(new java.awt.Font("Arial", 1, 18)); // NOI18N
@@ -153,6 +169,7 @@ public class Principal extends javax.swing.JFrame {
         });
 
         btnAgregar.setBackground(new java.awt.Color(0, 204, 255));
+        btnAgregar.setForeground(new java.awt.Color(51, 204, 0));
         btnAgregar.setText("AGREGAR");
         btnAgregar.setColorDeSombra(new java.awt.Color(0, 153, 255));
         btnAgregar.setFont(new java.awt.Font("Arial", 1, 18)); // NOI18N
@@ -163,6 +180,7 @@ public class Principal extends javax.swing.JFrame {
         });
 
         btnEliminar.setBackground(new java.awt.Color(0, 204, 255));
+        btnEliminar.setForeground(new java.awt.Color(255, 0, 51));
         btnEliminar.setText("ELIMINAR");
         btnEliminar.setColorDeSombra(new java.awt.Color(0, 153, 255));
         btnEliminar.setFont(new java.awt.Font("Arial", 1, 18)); // NOI18N
@@ -173,12 +191,24 @@ public class Principal extends javax.swing.JFrame {
         });
 
         btnConsulta.setBackground(new java.awt.Color(0, 204, 255));
+        btnConsulta.setForeground(new java.awt.Color(0, 255, 51));
         btnConsulta.setText("CONSULTA");
         btnConsulta.setColorDeSombra(new java.awt.Color(0, 153, 255));
         btnConsulta.setFont(new java.awt.Font("Arial", 1, 18)); // NOI18N
         btnConsulta.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnConsultaActionPerformed(evt);
+            }
+        });
+
+        btnHistorial.setBackground(new java.awt.Color(0, 204, 255));
+        btnHistorial.setForeground(new java.awt.Color(51, 255, 51));
+        btnHistorial.setText("HISTORIAL");
+        btnHistorial.setColorDeSombra(new java.awt.Color(0, 153, 255));
+        btnHistorial.setFont(new java.awt.Font("Arial", 1, 18)); // NOI18N
+        btnHistorial.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnHistorialActionPerformed(evt);
             }
         });
 
@@ -199,7 +229,8 @@ public class Principal extends javax.swing.JFrame {
                             .addComponent(btnLimpiar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(btnAgregar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(btnEliminar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(btnConsulta, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addComponent(btnConsulta, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(btnHistorial, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addContainerGap())))
         );
         panelRectTranslucido1Layout.setVerticalGroup(
@@ -217,7 +248,9 @@ public class Principal extends javax.swing.JFrame {
                 .addComponent(btnEliminar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addComponent(btnConsulta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 211, Short.MAX_VALUE)
+                .addGap(18, 18, 18)
+                .addComponent(btnHistorial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 158, Short.MAX_VALUE)
                 .addComponent(btnSalirr, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(83, 83, 83))
         );
@@ -342,47 +375,97 @@ public class Principal extends javax.swing.JFrame {
     }//GEN-LAST:event_btnAgregarActionPerformed
 
     private void btnEliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarActionPerformed
-           int selectedRow = tablePacientes.getSelectedRow();
-    if (selectedRow == -1) {
-        // No se ha seleccionado ningún paciente
-        JOptionPane.showMessageDialog(this, "Por favor, seleccione un paciente para eliminar.", "Error", JOptionPane.ERROR_MESSAGE);
-        return;
-    }
+     int selectedRow = tablePacientes.getSelectedRow();
 
-    int confirmResult = JOptionPane.showConfirmDialog(this, "¿Está seguro de que desea eliminar el paciente seleccionado?", "Confirmación", JOptionPane.YES_NO_OPTION);
-    if (confirmResult == JOptionPane.YES_OPTION) {
-        DefaultTableModel model = (DefaultTableModel) tablePacientes.getModel();
-        int pacienteId = (int) model.getValueAt(selectedRow, 0);
+    if (selectedRow >= 0 && selectedRow < tablePacientes.getRowCount()) {
+        int confirmResult = JOptionPane.showConfirmDialog(this, "¿Está seguro de que desea eliminar el paciente seleccionado?", "Confirmación", JOptionPane.YES_NO_OPTION);
+        
+        if (confirmResult == JOptionPane.YES_OPTION) {
+            DefaultTableModel model = (DefaultTableModel) tablePacientes.getModel();
+            int pacienteId = (int) model.getValueAt(selectedRow, 0);
 
-        try {
-            PacienteDAO pacienteDAO = new PacienteDAO(connection);
-            pacienteDAO.delete(pacienteId); // Eliminar el paciente de la base de datos
+            try {
+                PacienteDAO pacienteDAO = new PacienteDAO(connection);
+                pacienteDAO.delete(pacienteId); // Eliminar el paciente de la base de datos
 
-            model.removeRow(selectedRow); // Eliminar la fila de la tabla
+                model.removeRow(selectedRow); // Eliminar la fila de la tabla
 
-            JOptionPane.showMessageDialog(this, "Paciente eliminado correctamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
-        } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(this, "Error al eliminar el paciente.", "Error", JOptionPane.ERROR_MESSAGE);
-            ex.printStackTrace();
+                JOptionPane.showMessageDialog(this, "Paciente eliminado correctamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+            } catch (SQLException ex) {
+                JOptionPane.showMessageDialog(this, "Error al eliminar el paciente.", "Error", JOptionPane.ERROR_MESSAGE);
+                ex.printStackTrace();
+            }
         }
+    } else {
+        JOptionPane.showMessageDialog(this, "Por favor, seleccione un paciente válido para eliminar.", "Error", JOptionPane.ERROR_MESSAGE);
     }
     }//GEN-LAST:event_btnEliminarActionPerformed
 
     
     private void btnConsultaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnConsultaActionPerformed
-    int filaSeleccionada = tablePacientes.getSelectedRow();
-    if (filaSeleccionada != -1) {
-        int idPacienteSeleccionado = (int) tablePacientes.getValueAt(filaSeleccionada, 0);
-        String nombrePaciente = (String) tablePacientes.getValueAt(filaSeleccionada, 1);
-        String apellidoPaciente = (String) tablePacientes.getValueAt(filaSeleccionada, 2);
+ int selectedRow = tablePacientes.getSelectedRow();
+ PacienteDAO pacienteDAO = new PacienteDAO(connection);
+Paciente paciente = pacienteDAO.getById(idPacienteSeleccionado);
+
+
+    if (selectedRow >= 0) {
+        String nombrePaciente = (String) tablePacientes.getValueAt(selectedRow, 1);
+        String apellidoPaciente = (String) tablePacientes.getValueAt(selectedRow, 2);
+        int idPacienteSeleccionado = (int) tablePacientes.getValueAt(selectedRow, 0);
 
         NuevaConsulta nuevaConsulta = new NuevaConsulta(nombrePaciente, apellidoPaciente, idPacienteSeleccionado);
         nuevaConsulta.setVisible(true);
     } else {
-        // Manejar el caso en el que no se haya seleccionado ningún paciente
-        // Puedes mostrar un mensaje al usuario o realizar otras acciones
+        JOptionPane.showMessageDialog(this, "Por favor, seleccione un paciente para la consulta.", "Error", JOptionPane.ERROR_MESSAGE);
     }
     }//GEN-LAST:event_btnConsultaActionPerformed
+
+    private void btnHistorialActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnHistorialActionPerformed
+  int selectedRow = tablePacientes.getSelectedRow();
+    
+    if (selectedRow >= 0) {
+        int idPacienteSeleccionado = (int) tablePacientes.getValueAt(selectedRow, 0);
+        
+        try {
+            PacienteDAO pacienteDAO = new PacienteDAO(connection);
+            ConsultaDAO consultaDAO = new ConsultaDAO(connection);
+            
+            Paciente paciente = pacienteDAO.getPacienteById(idPacienteSeleccionado);
+            List<Consulta> consultas = consultaDAO.getConsultasByPacienteId(idPacienteSeleccionado);
+            
+            // Crear un nuevo documento PDF
+            Document document = new Document();
+            PdfWriter.getInstance(document, new FileOutputStream("HistorialPaciente.pdf"));
+            document.open();
+            
+            // Agregar información del paciente al PDF
+            Paragraph header = new Paragraph("Historial del Paciente");
+            header.setAlignment(Element.ALIGN_CENTER);
+            document.add(header);
+            
+            document.add(new Paragraph("Nombre: " + paciente.getNombre() + " " + paciente.getApellido()));
+            document.add(new Paragraph("Fecha de Nacimiento: " + paciente.getFechaNacimiento()));
+            document.add(new Paragraph("Obra Social: " + paciente.getObraSocial()));
+            
+            // Agregar información de las consultas
+            document.add(new Paragraph("Consultas:"));
+            for (Consulta consulta : consultas) {
+                document.add(new Paragraph("Título: " + consulta.getTitulo()));
+                document.add(new Paragraph("Diagnóstico: " + consulta.getDiagnostico()));
+                document.add(new Paragraph("-----------------------"));
+            }
+            
+            document.close();
+            JOptionPane.showMessageDialog(this, "PDF generado exitosamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+        } catch (DocumentException | IOException | SQLException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Error al generar el PDF.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    } else {
+        JOptionPane.showMessageDialog(this, "Por favor, seleccione un paciente para generar el historial.", "Error", JOptionPane.ERROR_MESSAGE);
+    }
+  
+    }//GEN-LAST:event_btnHistorialActionPerformed
 
    
 
@@ -391,6 +474,7 @@ public class Principal extends javax.swing.JFrame {
     private org.edisoncor.gui.button.ButtonAction btnBuscar;
     private org.edisoncor.gui.button.ButtonAction btnConsulta;
     private org.edisoncor.gui.button.ButtonAction btnEliminar;
+    private org.edisoncor.gui.button.ButtonAction btnHistorial;
     private org.edisoncor.gui.button.ButtonAction btnLimpiar;
     private org.edisoncor.gui.button.ButtonAction btnSalirr;
     private javax.swing.JScrollPane jScrollPane1;

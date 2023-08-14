@@ -5,17 +5,20 @@
 package finalantsistemamedico.view;
 
 import finalantsistemamedico.controller.ConsultaDAO;
+import finalantsistemamedico.controller.WindowManager;
 import finalantsistemamedico.model.Consulta;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import javax.swing.JOptionPane;
 
 /**
  *
  * @author Seba
  */
 public class NuevaConsulta extends javax.swing.JFrame {
-    private Connection connection; // Agregar un atributo de tipo Connection
+private Connection connection;
+    private ConsultaDAO consultaDAO; // Declara la variable sin inicializar
 
 
     private String nombrePaciente;
@@ -27,13 +30,14 @@ public class NuevaConsulta extends javax.swing.JFrame {
         this.nombrePaciente = nombrePaciente;
         this.apellidoPaciente = apellidoPaciente;
         this.idPacienteSeleccionado = idPacienteSeleccionado; // Inicializar la variable
-            this.connection = connection; // Asigna la conexión proporcionada
+      this.connection = connection; // Asigna la conexión proporcionada
+        this.consultaDAO = new ConsultaDAO(connection); // Crea la instancia de ConsultaDAO con la misma conexión
 
         initComponents();
 
         txtNombre.setText(nombrePaciente);
         txtApellido.setText(apellidoPaciente);
-        Connection connection = null;
+        
 
      
     }  
@@ -234,7 +238,30 @@ public class NuevaConsulta extends javax.swing.JFrame {
 
     
     private void btnGuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarActionPerformed
- 
+   String titulo = txtTitulo.getText();
+    String diagnostico = txtDiagnostico.getText();
+    
+    if (titulo.isEmpty() || diagnostico.isEmpty()) {
+        JOptionPane.showMessageDialog(this, "Por favor, complete todos los campos.", "Error", JOptionPane.ERROR_MESSAGE);
+    } else {
+        Consulta consulta = new Consulta();
+        consulta.setTitulo(titulo);
+        consulta.setDiagnostico(diagnostico);
+        consulta.setIdPaciente(idPacienteSeleccionado);
+        
+      try {
+    consultaDAO.insert(consulta);
+    JOptionPane.showMessageDialog(this, "Consulta guardada exitosamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+            
+    // Cierra la ventana actual
+    this.dispose();
+            
+    // Muestra la ventana principal nuevamente
+    WindowManager.getPrincipalInstance().setVisible(true);
+} catch (SQLException ex) {
+    JOptionPane.showMessageDialog(this, "Error al guardar la consulta: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+}
+    }
     }//GEN-LAST:event_btnGuardarActionPerformed
 
  

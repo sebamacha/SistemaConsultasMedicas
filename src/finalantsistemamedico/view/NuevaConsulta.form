@@ -114,10 +114,8 @@
                                           <EmptySpace min="-2" pref="31" max="-2" attributes="0"/>
                                           <Component id="txtTitulo" min="-2" pref="324" max="-2" attributes="0"/>
                                       </Group>
-                                      <Group type="103" alignment="0" groupAlignment="1" attributes="0">
-                                          <Component id="jLabel5" alignment="0" min="-2" max="-2" attributes="0"/>
-                                          <Component id="jScrollPane1" alignment="0" min="-2" pref="416" max="-2" attributes="0"/>
-                                      </Group>
+                                      <Component id="jLabel5" alignment="0" min="-2" max="-2" attributes="0"/>
+                                      <Component id="jScrollPane1" alignment="0" min="-2" pref="416" max="-2" attributes="0"/>
                                   </Group>
                               </Group>
                           </Group>

@@ -11,6 +11,7 @@ import java.util.List;
 
 public class ConsultaDAO {
     private Connection connection;
+    
 
     public ConsultaDAO(Connection connection) {
         this.connection = connection;
@@ -21,16 +22,24 @@ public class ConsultaDAO {
     public ConsultaDAO() {
     }
     
-    // Método para insertar una consulta en la base de datos
-    public void insert(Consulta consulta) throws SQLException {
-        String sql = "INSERT INTO consultas (Titulo, Diagnostico, IdPaciente) VALUES (?, ?, ?)";
-        try (PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setString(1, consulta.getTitulo());
-            statement.setString(2, consulta.getDiagnostico());
-            statement.setInt(3, consulta.getIdPaciente());
-            statement.executeUpdate();
-        }
+  // Método para insertar una consulta en la base de datos
+public void insert(Consulta consulta) throws SQLException {
+    String sql = "INSERT INTO consultas (Titulo, Diagnostico, IdPaciente) VALUES (?, ?, ?)";
+    try (PreparedStatement statement = connection.prepareStatement(sql)) {
+        statement.setString(1, consulta.getTitulo());
+        statement.setString(2, consulta.getDiagnostico());
+        statement.setInt(3, consulta.getIdPaciente());
+        statement.executeUpdate();
+    } catch (SQLException e) {
+        // Manejar la excepción aquí, por ejemplo:
+        System.err.println("Error al insertar la consulta en la base de datos: " + e.getMessage());
+        throw e; // Relanzar la excepción para que pueda ser manejada en otro lugar si es necesario
+    } finally {
+        // Cerrar recursos, como el PreparedStatement, si es necesario
     }
+}
+
+
     
     // Método para actualizar una consulta en la base de datos
     public void update(Consulta consulta) throws SQLException {
@@ -74,4 +83,8 @@ public class ConsultaDAO {
     }
     
     // Otros métodos para obtener consultas por ID, por paciente, etc.
+
+    public List<Consulta> getConsultasByPacienteId(int idPacienteSeleccionado) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
 }
