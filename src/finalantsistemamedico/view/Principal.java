@@ -1,6 +1,15 @@
 
 package finalantsistemamedico.view;
 
+import java.io.ByteArrayOutputStream;
+import javax.swing.JOptionPane;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.PDPageContentStream;
+import org.apache.pdfbox.pdmodel.common.PDRectangle;
+import org.apache.pdfbox.pdmodel.font.PDType1Font;
+
+
 
 import com.lowagie.text.Document;
 import com.lowagie.text.DocumentException;
@@ -11,12 +20,19 @@ import finalantsistemamedico.controller.ConsultaDAO;
 import finalantsistemamedico.controller.PacienteDAO;
 import finalantsistemamedico.model.Consulta;
 import finalantsistemamedico.model.Paciente;
+import java.awt.Desktop;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.util.List;
+import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
@@ -426,50 +442,80 @@ private static Principal instancia;
     }//GEN-LAST:event_btnConsultaActionPerformed
 
     private void btnHistorialActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnHistorialActionPerformed
-  int selectedRow = tablePacientes.getSelectedRow();
-    
-    if (selectedRow >= 0) {
-        int idPacienteSeleccionado = (int) tablePacientes.getValueAt(selectedRow, 0);
-        
-        try {
-            PacienteDAO pacienteDAO = new PacienteDAO(connection);
-            ConsultaDAO consultaDAO = new ConsultaDAO(connection);
-            
-            Paciente paciente = pacienteDAO.getPacienteById(idPacienteSeleccionado);
-            List<Consulta> consultas = consultaDAO.getConsultasByPacienteId(idPacienteSeleccionado);
-            
-            // Crear un nuevo documento PDF
-            Document document = new Document();
-            PdfWriter.getInstance(document, new FileOutputStream("HistorialPaciente.pdf"));
-            document.open();
-            
-            // Agregar información del paciente al PDF
-            Paragraph header = new Paragraph("Historial del Paciente");
-            header.setAlignment(Element.ALIGN_CENTER);
-            document.add(header);
-            
-            document.add(new Paragraph("Nombre: " + paciente.getNombre() + " " + paciente.getApellido()));
-            document.add(new Paragraph("Fecha de Nacimiento: " + paciente.getFechaNacimiento()));
-            document.add(new Paragraph("Obra Social: " + paciente.getObraSocial()));
-            
-            // Agregar información de las consultas
-            document.add(new Paragraph("Consultas:"));
-            for (Consulta consulta : consultas) {
-                document.add(new Paragraph("Título: " + consulta.getTitulo()));
-                document.add(new Paragraph("Diagnóstico: " + consulta.getDiagnostico()));
-                document.add(new Paragraph("-----------------------"));
-            }
-            
-            document.close();
-            JOptionPane.showMessageDialog(this, "PDF generado exitosamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
-        } catch (DocumentException | IOException | SQLException e) {
-            e.printStackTrace();
-            JOptionPane.showMessageDialog(this, "Error al generar el PDF.", "Error", JOptionPane.ERROR_MESSAGE);
+      try {
+        int selectedRow = tablePacientes.getSelectedRow();
+        if (selectedRow == -1) {
+            // No se ha seleccionado ningún paciente, muestra un mensaje de error
+            JOptionPane.showMessageDialog(this, "Por favor, seleccione un paciente para generar el historial.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
         }
-    } else {
-        JOptionPane.showMessageDialog(this, "Por favor, seleccione un paciente para generar el historial.", "Error", JOptionPane.ERROR_MESSAGE);
+
+        int idPacienteSeleccionado = (int) tablePacientes.getValueAt(selectedRow, 0);
+
+        PDDocument documento = new PDDocument();
+        PDPage pagina = new PDPage(PDRectangle.A4);
+        documento.addPage(pagina);
+        PDPageContentStream contenido = new PDPageContentStream(documento, pagina);
+        
+        contenido.beginText();
+        contenido.setFont(PDType1Font.TIMES_BOLD, 12);
+        contenido.newLineAtOffset(20, pagina.getMediaBox().getHeight() - 52);
+        
+        PacienteDAO pacienteDAO = new PacienteDAO(connection);
+        Paciente pacienteSeleccionado = pacienteDAO.getPacienteById(idPacienteSeleccionado);
+        
+        // Mostrar los datos del paciente en el PDF
+        contenido.showText("Datos del Paciente:");
+        contenido.newLine();
+        contenido.showText("Nombre: " + pacienteSeleccionado.getNombre());
+        contenido.newLine();
+        contenido.showText("Apellido: " + pacienteSeleccionado.getApellido());
+
+        // Formatear y mostrar la fecha de nacimiento en el PDF
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy"); // Cambia el formato según tus preferencias
+        String fechaNacimientoFormatted = dateFormat.format(pacienteSeleccionado.getFechaNacimiento());
+        contenido.showText("Fecha de Nacimiento: " + fechaNacimientoFormatted);
+
+        contenido.newLine();
+        contenido.showText("Obra Social: " + pacienteSeleccionado.getObraSocial());
+        contenido.newLine();
+        contenido.showText("Número de Socio: " + pacienteSeleccionado.getNumeroSocio());
+        contenido.newLine();
+        contenido.showText("Antecedentes Personales: " + pacienteSeleccionado.getAntecedentesPersonales());
+        contenido.newLine();
+        contenido.showText("Antecedentes Familiares: " + pacienteSeleccionado.getAntecedentesFamiliares());
+        contenido.newLine();
+        
+        contenido.showText("Consultas:");
+        contenido.newLine();
+        
+        ConsultaDAO consultaDAO = new ConsultaDAO(connection);
+        List<Consulta> consultas = consultaDAO.getConsultasByPacienteId(idPacienteSeleccionado);
+        
+        for (Consulta consulta : consultas) {
+            contenido.showText("Título: " + consulta.getTitulo());
+            contenido.newLine();
+            contenido.showText("Diagnóstico: " + consulta.getDiagnostico());
+            contenido.newLine();
+            contenido.newLine();
+        }
+        
+        contenido.endText();
+        contenido.close();
+        
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        documento.save(outputStream);
+        documento.close();
+        
+        // Guardar el PDF en un archivo temporal
+        File tempFile = File.createTempFile("historial", ".pdf");
+        Files.write(tempFile.toPath(), outputStream.toByteArray());
+        
+        // Abrir el archivo PDF en el visor predeterminado del sistema
+        Desktop.getDesktop().open(tempFile);
+    } catch (Exception e) {
+        System.out.println("Error al generar: " + e.getMessage());
     }
-  
     }//GEN-LAST:event_btnHistorialActionPerformed
 
    
