@@ -213,9 +213,8 @@ private static Principal instancia;
 
         btnConsulta.setBackground(new java.awt.Color(0, 204, 255));
         btnConsulta.setForeground(new java.awt.Color(0, 255, 51));
-        btnConsulta.setText("CONSULTA");
+        btnConsulta.setText("NUEVA CONSULTA");
         btnConsulta.setColorDeSombra(new java.awt.Color(0, 153, 255));
-        btnConsulta.setFont(new java.awt.Font("Arial", 1, 18)); // NOI18N
         btnConsulta.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnConsultaActionPerformed(evt);
@@ -224,9 +223,8 @@ private static Principal instancia;
 
         btnHistorial.setBackground(new java.awt.Color(0, 204, 255));
         btnHistorial.setForeground(new java.awt.Color(51, 255, 51));
-        btnHistorial.setText("HISTORIAL");
+        btnHistorial.setText("VER HISTORIAL");
         btnHistorial.setColorDeSombra(new java.awt.Color(0, 153, 255));
-        btnHistorial.setFont(new java.awt.Font("Arial", 1, 18)); // NOI18N
         btnHistorial.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnHistorialActionPerformed(evt);
@@ -442,10 +440,10 @@ private static Principal instancia;
     }//GEN-LAST:event_btnConsultaActionPerformed
 
     private void btnHistorialActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnHistorialActionPerformed
-      try {
+     try {
         int selectedRow = tablePacientes.getSelectedRow();
+
         if (selectedRow == -1) {
-            // No se ha seleccionado ningún paciente, muestra un mensaje de error
             JOptionPane.showMessageDialog(this, "Por favor, seleccione un paciente para generar el historial.", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
@@ -456,62 +454,65 @@ private static Principal instancia;
         PDPage pagina = new PDPage(PDRectangle.A4);
         documento.addPage(pagina);
         PDPageContentStream contenido = new PDPageContentStream(documento, pagina);
-        
+
         contenido.beginText();
         contenido.setFont(PDType1Font.TIMES_BOLD, 12);
         contenido.newLineAtOffset(20, pagina.getMediaBox().getHeight() - 52);
-        
+
         PacienteDAO pacienteDAO = new PacienteDAO(connection);
         Paciente pacienteSeleccionado = pacienteDAO.getPacienteById(idPacienteSeleccionado);
-        
-        // Mostrar los datos del paciente en el PDF
-        contenido.showText("Datos del Paciente:");
-        contenido.newLine();
-        contenido.showText("Nombre: " + pacienteSeleccionado.getNombre());
-        contenido.newLine();
-        contenido.showText("Apellido: " + pacienteSeleccionado.getApellido());
 
-        // Formatear y mostrar la fecha de nacimiento en el PDF
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy"); // Cambia el formato según tus preferencias
+        contenido.showText("Datos del Paciente:");
+         contenido.newLineAtOffset(0, -15);
+        contenido.newLine();
+
+        // Mostrar los datos del paciente en el PDF
+        contenido.showText("Nombre: " + pacienteSeleccionado.getNombre());
+        contenido.newLineAtOffset(0, -15); // Espacio entre líneas
+        contenido.showText("Apellido: " + pacienteSeleccionado.getApellido());
+        contenido.newLineAtOffset(0, -15);
+        
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
         String fechaNacimientoFormatted = dateFormat.format(pacienteSeleccionado.getFechaNacimiento());
         contenido.showText("Fecha de Nacimiento: " + fechaNacimientoFormatted);
-
-        contenido.newLine();
+        contenido.newLineAtOffset(0, -15);
+        
         contenido.showText("Obra Social: " + pacienteSeleccionado.getObraSocial());
-        contenido.newLine();
+        contenido.newLineAtOffset(0, -15);
+        
         contenido.showText("Número de Socio: " + pacienteSeleccionado.getNumeroSocio());
-        contenido.newLine();
+        contenido.newLineAtOffset(0, -15);
+        
         contenido.showText("Antecedentes Personales: " + pacienteSeleccionado.getAntecedentesPersonales());
-        contenido.newLine();
+        contenido.newLineAtOffset(0, -15);
+        
         contenido.showText("Antecedentes Familiares: " + pacienteSeleccionado.getAntecedentesFamiliares());
-        contenido.newLine();
-        
+        contenido.newLineAtOffset(0, -15);
+
         contenido.showText("Consultas:");
-        contenido.newLine();
-        
+        contenido.newLineAtOffset(0, -15);
+
         ConsultaDAO consultaDAO = new ConsultaDAO(connection);
         List<Consulta> consultas = consultaDAO.getConsultasByPacienteId(idPacienteSeleccionado);
-        
+
         for (Consulta consulta : consultas) {
             contenido.showText("Título: " + consulta.getTitulo());
-            contenido.newLine();
+            contenido.newLineAtOffset(0, -15);
             contenido.showText("Diagnóstico: " + consulta.getDiagnostico());
-            contenido.newLine();
-            contenido.newLine();
+            contenido.newLineAtOffset(0, -15);
+            contenido.newLineAtOffset(0, -15); // Espacio entre consultas
         }
-        
+
         contenido.endText();
         contenido.close();
-        
+
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         documento.save(outputStream);
         documento.close();
-        
-        // Guardar el PDF en un archivo temporal
+
         File tempFile = File.createTempFile("historial", ".pdf");
         Files.write(tempFile.toPath(), outputStream.toByteArray());
-        
-        // Abrir el archivo PDF en el visor predeterminado del sistema
+
         Desktop.getDesktop().open(tempFile);
     } catch (Exception e) {
         System.out.println("Error al generar: " + e.getMessage());

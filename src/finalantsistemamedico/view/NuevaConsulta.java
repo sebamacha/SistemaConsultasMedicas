@@ -136,9 +136,8 @@ private Connection connection;
                                 .addComponent(jLabel3)
                                 .addGap(31, 31, 31)
                                 .addComponent(txtTitulo, javax.swing.GroupLayout.PREFERRED_SIZE, 324, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(panelRectTranslucido1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                .addComponent(jLabel5, javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 416, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                            .addComponent(jLabel5)
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 416, javax.swing.GroupLayout.PREFERRED_SIZE))))
                 .addContainerGap(17, Short.MAX_VALUE))
         );
         panelRectTranslucido1Layout.setVerticalGroup(
@@ -165,8 +164,8 @@ private Connection connection;
                 .addContainerGap(36, Short.MAX_VALUE))
         );
 
-        btnGuardar.setFont(new java.awt.Font("Dialog", 3, 18)); // NOI18N
-        btnGuardar.setForeground(new java.awt.Color(51, 255, 51));
+        btnGuardar.setFont(new java.awt.Font("Dialog", 3, 12)); // NOI18N
+        btnGuardar.setForeground(new java.awt.Color(0, 102, 102));
         btnGuardar.setText("GUARDAR");
         btnGuardar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {

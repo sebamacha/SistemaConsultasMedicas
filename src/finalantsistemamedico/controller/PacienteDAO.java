@@ -55,27 +55,29 @@ public void create(Paciente paciente) throws SQLException {
         }
         return null;
     }
- public Paciente getPacienteById(int pacienteId) throws SQLException {
-        Paciente paciente = null;
+public Paciente getPacienteById(int pacienteId) throws SQLException {
+    Paciente paciente = null;
 
-        String query = "SELECT * FROM pacientes WHERE id = ?";
-        try (PreparedStatement statement = connection.prepareStatement(query)) {
-            statement.setInt(1, pacienteId);
-            try (ResultSet resultSet = statement.executeQuery()) {
-                if (resultSet.next()) {
-                    paciente = new Paciente();
-                    paciente.setId(resultSet.getInt("id"));
-                    paciente.setNombre(resultSet.getString("nombre"));
-                    paciente.setApellido(resultSet.getString("apellido"));
-                    paciente.setFechaNacimiento(resultSet.getDate("fecha_nacimiento"));
-                    paciente.setObraSocial(resultSet.getString("obra_social"));
-                    // ... Configura el resto de las propiedades del paciente
-                }
+    String query = "SELECT * FROM pacientes WHERE id = ?";
+    try (PreparedStatement statement = connection.prepareStatement(query)) {
+        statement.setInt(1, pacienteId);
+        try (ResultSet resultSet = statement.executeQuery()) {
+            if (resultSet.next()) {
+                paciente = new Paciente();
+                paciente.setId(resultSet.getInt("id"));
+                paciente.setNombre(resultSet.getString("nombre"));
+                paciente.setApellido(resultSet.getString("apellido"));
+                paciente.setFechaNacimiento(resultSet.getDate("FechaNacimiento")); // Utiliza el nombre correcto de la columna
+                paciente.setObraSocial(resultSet.getString("ObraSocial"));
+                paciente.setAntecedentesPersonales(resultSet.getString("AntecedentesPersonales"));
+                paciente.setAntecedentesFamiliares(resultSet.getString("AntecedentesFamiliares"));
+                // ... Configura el resto de las propiedades del paciente
             }
         }
-        
-        return paciente;
     }
+    
+    return paciente;
+}
  public void update(Paciente paciente) throws SQLException {
     String sql = "UPDATE pacientes SET Nombre = ?, Apellido = ?, FechaNacimiento = ?, ObraSocial = ?, NumeroSocio = ?, AntecedentesPersonales = ?, AntecedentesFamiliares = ? WHERE Id = ?";
     try (PreparedStatement statement = connection.prepareStatement(sql)) {
