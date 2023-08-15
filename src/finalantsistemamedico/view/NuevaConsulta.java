@@ -26,21 +26,19 @@ private Connection connection;
     private int idPacienteSeleccionado; // Agregar esta variable
 
 
-     public NuevaConsulta(String nombrePaciente, String apellidoPaciente, int idPacienteSeleccionado) {
-        this.nombrePaciente = nombrePaciente;
-        this.apellidoPaciente = apellidoPaciente;
-        this.idPacienteSeleccionado = idPacienteSeleccionado; // Inicializar la variable
-      this.connection = connection; // Asigna la conexión proporcionada
-        this.consultaDAO = new ConsultaDAO(connection); // Crea la instancia de ConsultaDAO con la misma conexión
+     public NuevaConsulta(Connection connection, String nombrePaciente, String apellidoPaciente, int idPacienteSeleccionado) {
+    this.connection = connection; // Asigna la conexión proporcionada
+    this.consultaDAO = new ConsultaDAO(connection); // Crea la instancia de ConsultaDAO con la misma conexión
+    this.nombrePaciente = nombrePaciente;
+    this.apellidoPaciente = apellidoPaciente;
+    this.idPacienteSeleccionado = idPacienteSeleccionado; // Inicializar la variable
 
-        initComponents();
+    initComponents();
 
-        txtNombre.setText(nombrePaciente);
-        txtApellido.setText(apellidoPaciente);
-        
+    txtNombre.setText(nombrePaciente);
+    txtApellido.setText(apellidoPaciente);
+}
 
-     
-    }  
      
 
     /**
@@ -238,29 +236,23 @@ private Connection connection;
 
     
     private void btnGuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarActionPerformed
-   String titulo = txtTitulo.getText();
+  // Obtener los valores de los campos de texto
+    String titulo = txtTitulo.getText();
     String diagnostico = txtDiagnostico.getText();
-    
-    if (titulo.isEmpty() || diagnostico.isEmpty()) {
-        JOptionPane.showMessageDialog(this, "Por favor, complete todos los campos.", "Error", JOptionPane.ERROR_MESSAGE);
-    } else {
-        Consulta consulta = new Consulta();
-        consulta.setTitulo(titulo);
-        consulta.setDiagnostico(diagnostico);
-        consulta.setIdPaciente(idPacienteSeleccionado);
-        
-      try {
-    consultaDAO.insert(consulta);
-    JOptionPane.showMessageDialog(this, "Consulta guardada exitosamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
-            
-    // Cierra la ventana actual
-    this.dispose();
-            
-    // Muestra la ventana principal nuevamente
-    WindowManager.getPrincipalInstance().setVisible(true);
-} catch (SQLException ex) {
-    JOptionPane.showMessageDialog(this, "Error al guardar la consulta: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-}
+
+    // Crear un nuevo objeto Consulta con los valores obtenidos
+    Consulta consulta = new Consulta();
+    consulta.setTitulo(titulo);
+    consulta.setDiagnostico(diagnostico);
+    consulta.setIdPaciente(idPacienteSeleccionado);
+
+    // Llamar al método insert de la clase ConsultaDAO para guardar la consulta en la base de datos
+    try {
+        consultaDAO.insert(consulta);
+        JOptionPane.showMessageDialog(this, "Consulta guardada con éxito");
+         dispose(); // Cerrar la ventana
+    } catch (SQLException e) {
+        JOptionPane.showMessageDialog(this, "Error al guardar la consulta: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
     }
     }//GEN-LAST:event_btnGuardarActionPerformed
 

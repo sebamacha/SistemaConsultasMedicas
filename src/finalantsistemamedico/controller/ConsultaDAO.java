@@ -84,7 +84,25 @@ public void insert(Consulta consulta) throws SQLException {
     
     // Otros métodos para obtener consultas por ID, por paciente, etc.
 
-    public List<Consulta> getConsultasByPacienteId(int idPacienteSeleccionado) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+   public List<Consulta> getConsultasByPacienteId(int idPacienteSeleccionado) {
+    List<Consulta> consultas = new ArrayList<>();
+    String sql = "SELECT * FROM consultas WHERE IdPaciente = ?";
+    try (PreparedStatement statement = connection.prepareStatement(sql)) {
+        statement.setInt(1, idPacienteSeleccionado);
+        try (ResultSet resultSet = statement.executeQuery()) {
+            while (resultSet.next()) {
+                Consulta consulta = new Consulta();
+                consulta.setIdConsulta(resultSet.getInt("IdConsulta"));
+                consulta.setTitulo(resultSet.getString("Titulo"));
+                consulta.setDiagnostico(resultSet.getString("Diagnostico"));
+                consulta.setIdPaciente(resultSet.getInt("IdPaciente"));
+                consultas.add(consulta);
+            }
+        }
+    } catch (SQLException e) {
+        // Manejar la excepción aquí, por ejemplo, imprimir el mensaje de error
+        e.printStackTrace();
     }
+    return consultas;
+}
 }

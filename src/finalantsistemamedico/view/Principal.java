@@ -52,7 +52,7 @@ private static Principal instancia;
     try {
         pacientes = pacienteDAO.getAll();
     } catch (SQLException e) {
-        // Manejar la excepción aquí, por ejemplo, imprimir el mensaje de error
+        System.out.println(pacientes);
         e.printStackTrace();
     }
 
@@ -75,16 +75,21 @@ private static Principal instancia;
         }
     }
        // Agregar un listener de selección a la tabla
-    tablePacientes.getSelectionModel().addListSelectionListener(e -> {
-        if (!e.getValueIsAdjusting()) {
+ tablePacientes.getSelectionModel().addListSelectionListener(e -> {
+    if (!e.getValueIsAdjusting()) {
+        try {
             // Obtener el valor de la columna invisible de ID del paciente seleccionado
             int selectedRow = tablePacientes.getSelectedRow();
             int idPacienteSeleccionado = (int) tablePacientes.getValueAt(selectedRow, 0); // Cambia 0 por el índice correcto de la columna
 
             // Puedes almacenar idPacienteSeleccionado como una variable de clase en tu objeto Principal
             this.idPacienteSeleccionado = idPacienteSeleccionado;
+        } catch (ArrayIndexOutOfBoundsException ex) {
+            // Manejar la excepción aquí, por ejemplo, imprimir un mensaje de error o mostrar un diálogo de error
+            System.err.println("Error: Paciente no indexado");
         }
-    });
+    }
+});
 }
 
 
@@ -403,21 +408,21 @@ private static Principal instancia;
 
     
     private void btnConsultaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnConsultaActionPerformed
- int selectedRow = tablePacientes.getSelectedRow();
- PacienteDAO pacienteDAO = new PacienteDAO(connection);
-Paciente paciente = pacienteDAO.getById(idPacienteSeleccionado);
-
-
-    if (selectedRow >= 0) {
-        String nombrePaciente = (String) tablePacientes.getValueAt(selectedRow, 1);
-        String apellidoPaciente = (String) tablePacientes.getValueAt(selectedRow, 2);
-        int idPacienteSeleccionado = (int) tablePacientes.getValueAt(selectedRow, 0);
-
-        NuevaConsulta nuevaConsulta = new NuevaConsulta(nombrePaciente, apellidoPaciente, idPacienteSeleccionado);
-        nuevaConsulta.setVisible(true);
-    } else {
-        JOptionPane.showMessageDialog(this, "Por favor, seleccione un paciente para la consulta.", "Error", JOptionPane.ERROR_MESSAGE);
+    // Obtener el índice de la fila seleccionada en la tabla
+    int selectedRow = tablePacientes.getSelectedRow();
+    if (selectedRow == -1) {
+        // No hay ninguna fila seleccionada en la tabla
+        JOptionPane.showMessageDialog(this, "Por favor, seleccione un paciente en la tabla", "Error", JOptionPane.ERROR_MESSAGE);
+        return;
     }
+
+    // Obtener los valores de las celdas de la fila seleccionada
+    String nombrePaciente = (String) tablePacientes.getValueAt(selectedRow, 1); // Cambia 1 por el índice correcto de la columna
+    String apellidoPaciente = (String) tablePacientes.getValueAt(selectedRow, 2); // Cambia 2 por el índice correcto de la columna
+
+    // Crear una instancia de la clase NuevaConsulta y proporcionarle una conexión a la base de datos
+    NuevaConsulta nuevaConsulta = new NuevaConsulta(connection, nombrePaciente, apellidoPaciente, idPacienteSeleccionado);
+    nuevaConsulta.setVisible(true);
     }//GEN-LAST:event_btnConsultaActionPerformed
 
     private void btnHistorialActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnHistorialActionPerformed

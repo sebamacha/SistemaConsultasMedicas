@@ -9,6 +9,7 @@ import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import javax.swing.JOptionPane;
 
 public class PacienteDAO {
     private Connection connection;
@@ -180,8 +181,30 @@ public void delete(int id) throws SQLException {
         return consultas;
     }
 
-    public Paciente getById(int idPacienteSeleccionado) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+   public Paciente getById(int idPacienteSeleccionado) {
+    Paciente paciente = null;
+    String sql = "SELECT * FROM pacientes WHERE Id = ?";
+    try (PreparedStatement statement = connection.prepareStatement(sql)) {
+        statement.setInt(1, idPacienteSeleccionado);
+        try (ResultSet resultSet = statement.executeQuery()) {
+            if (resultSet.next()) {
+                paciente = new Paciente();
+                paciente.setId(resultSet.getInt("Id"));
+                paciente.setNombre(resultSet.getString("Nombre"));
+                paciente.setApellido(resultSet.getString("Apellido"));
+                paciente.setFechaNacimiento(resultSet.getDate("FechaNacimiento"));
+                paciente.setObraSocial(resultSet.getString("ObraSocial"));
+                paciente.setNumeroSocio(resultSet.getString("NumeroSocio"));
+                paciente.setAntecedentesPersonales(resultSet.getString("AntecedentesPersonales"));
+                paciente.setAntecedentesFamiliares(resultSet.getString("AntecedentesFamiliares"));
+            }
+        }
+    } catch (SQLException e) {
+        // Manejar la excepción aquí, por ejemplo, mostrar un diálogo de error al usuario
+        JOptionPane.showMessageDialog(null, "Error: Paciente no encontrado o no seleccionado", "Error", JOptionPane.ERROR_MESSAGE);
     }
+    return paciente;
+}
+
 
 }
